@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+# Download all custom emojis from Slack into a proper filename EMOJINAME.png
+require 'json'
+
+f = File.open("emoji.list")
+s = f.read
+j = JSON.parse(s)
+
+def target_filename(name, url)
+  "#{name}#{File.extname(url)}"
+end
+# some are aliases
+downloadables = j["emoji"].select{|k,v| !(v =~ /alias/)}
+downloadables.each{|k,v| `wget #{v} -O #{target_filename(k,v)}`};nil

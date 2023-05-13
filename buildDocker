@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "Prepare Build Environment"
+
+docker pull tonistiigi/binfmt
+docker run --privileged --rm tonistiigi/binfmt --install linux/amd64,linux/arm/v7,linux/arm64
+docker buildx create --use --driver docker-container --name binfmt --platform=linux/amd64,linux/arm/v7,linux/arm64
+docker buildx inspect --bootstrap
+
+echo "Build Container"
+
+docker buildx build \
+    --tag ghcr.io/maxwellpower/mmemoji:latest \
+    --platform linux/amd64,linux/arm/v7,linux/arm64 \
+    --push \
+    .
+
+echo "Cleanup Build Environment"
+
+docker buildx rm binfmt
+docker image rm tonistiigi/binfmt
+
+echo "DONE Build"
