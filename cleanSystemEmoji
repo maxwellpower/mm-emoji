@@ -7,5 +7,5 @@ systemEmojis=("grinning" "smiley" "smile" "grin" "laughing" "satisfied" "sweat_s
 
 ## Remove all systemEmojis
 for emoji in ${systemEmojis[@]}; do
-    rm -r $emoji.* &> /dev/null
+    rm -f $emoji.* &> /dev/null
 done

@@ -22,7 +22,7 @@ if [ -z ${MM_PASSWORD+x} ]; then echo "MM_PASSWORD Missing" && exit 1; fi
 ##################################
 
 function _usage() {
-  printf "Usage: get \n"
+  printf "Usage: run \n"
   exit 0
 }
 
