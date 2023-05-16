@@ -8,14 +8,15 @@ The Docker image will download all emoji's from Slack and upload them to Matterm
 
 - Copy the `defaults.env` file to your local directory and edit it to include your Slack and Mattermost credentials
 
-```bash
-docker run --env-file defaults.env ghcr.io/maxwellpower/mmemoji
-```
+  ```bash
+  docker run --env-file defaults.env ghcr.io/maxwellpower/mmemoji
+  ```
 
 ### Create Slack App
 
 - https://api.slack.com/apps
 - Use Manifest
+
   ```yaml
   display_information:
     name: mmemoji
@@ -31,7 +32,6 @@ docker run --env-file defaults.env ghcr.io/maxwellpower/mmemoji
 
 - Install App to Workspace
 - Copy Auth Token
-
 
 ## Based on
 
