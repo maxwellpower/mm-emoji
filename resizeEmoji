@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Mattermost Slack Emoji Transfer Tool
 
 # Copyright (c) 2023 Maxwell Power
@@ -12,21 +14,14 @@
 # AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-FROM python
+# resize all image formats that are larger than 1024X1024
+function _resizeEmoji() {
+  for file in *.{gif,jpg,jpeg,png}; do
+    if [ -f "$file" ]; then
+      echo "Resizing $file ..."
+      convert "$file" -resize 1024x1024\> "$file"
+    fi
+  done
+}
 
-LABEL org.opencontainers.image.source = "https://github.com/maxwellpower/mmemoji"
-
-RUN apt-get update \
-&& apt-get install -yqq --no-install-recommends ruby-full imagemagick \
-&& apt-get autoremove --purge -yqq \
-&& apt-get clean \
-&& rm -rf /var/lib/apt/lists/* \
-&& pip install mmemoji \
-&& mkdir mmemoji
-
-COPY docker-entrypoint downloadEmoji resizeEmoji cleanSystemEmoji /usr/local/bin/
-
-WORKDIR ["mmemoji"]
-
-ENTRYPOINT [ "docker-entrypoint" ]
-CMD [ "run" ]
+_resizeEmoji

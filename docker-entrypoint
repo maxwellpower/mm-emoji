@@ -34,9 +34,14 @@ function _getEmojiesList() {
 
 function _downloadEmojies() {
   echo "Downloading Emojis from Slack ..."
-  download
+  downloadEmoji
   echo "Clean System Emoji's before Upload"
   cleanSystemEmoji
+}
+
+function _resizeEmojies() {
+  echo "Resizing Emojis ..."
+  resizeEmoji
 }
 
 function _createEmojies() {
@@ -54,6 +59,7 @@ if [ "$1" == 'run' ]; then
   echo "Getting Emojies from Slack and Uploading to Mattermost"
   _getEmojiesList
   _downloadEmojies
+  _resizeEmojies
   _createEmojies
 else
   _usage

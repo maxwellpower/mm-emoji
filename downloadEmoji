@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+## See https://tomash.wrug.eu/blog/2022/11/06/migrating-slack-to-mattermost for details
+
 # Download all custom emojis from Slack into a proper filename EMOJINAME.png
 require 'json'
 
