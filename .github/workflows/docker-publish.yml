@@ -1,22 +1,16 @@
 name: Docker
-
 on:
   schedule:
     - cron: '28 19 * * *'
   push:
-    branches:
-      - main
-      - 'refs/tags/v*.*.*'
+    branches: [ "main" ]
+    tags: [ 'v*.*.*', 'latest' ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-
-permissions:
-  packages: write
 
 jobs:
   build:
@@ -63,9 +57,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ${{ github.ref == 'refs/heads/main' && 'latest' }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
