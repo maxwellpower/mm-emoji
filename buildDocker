@@ -24,7 +24,7 @@ docker buildx inspect --bootstrap
 echo "Build Container"
 
 docker buildx build \
-    --tag ghcr.io/maxwellpower/mmemoji:latest \
+    --tag ghcr.io/maxwellpower/mm-emoji:latest \
     --platform linux/amd64,linux/arm/v7,linux/arm64 \
     --push \
     .

@@ -6,10 +6,13 @@ Transfer emojies from Slack to Mattermost
 
 The Docker image will download all emoji's from Slack and upload them to Mattermost.
 
-- Copy the `defaults.env` file to your local directory and edit it to include your Slack and Mattermost credentials
+- Copy the `defaults.env` file to `.env` in your local directory and edit it to include your Slack and 
+Mattermost credentials
 
   ```bash
-  docker run --env-file defaults.env ghcr.io/maxwellpower/mmemoji
+  cp defaults.env .env
+  vi .env
+  docker run --env-file=.env ghcr.io/maxwellpower/mm-emoji
   ```
 
 ### Create Slack App
