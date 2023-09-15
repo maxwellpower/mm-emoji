@@ -44,7 +44,18 @@ function _usage() {
 
 function _getEmojiesList() {
   echo "Getting Emoji List ..."
-  curl -O -s --header "Authorization: Bearer $SLACK_TOKEN" "https://slack.com/api/emoji.list"
+
+  # Perform the request and store the response in the emoji.list file
+  curl -o emoji.list -s --header "Authorization: Bearer $SLACK_TOKEN" "https://slack.com/api/emoji.list"
+
+  # Check if the emoji.list file contains an "error" field
+  if grep -q '"error":' emoji.list; then
+    echo "Error: Failed to fetch Emoji List!"
+    cat emoji.list
+    exit 1
+  else
+    echo "Emoji List fetched successfully."
+  fi
 }
 
 function _downloadEmojies() {
