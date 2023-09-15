@@ -12,7 +12,7 @@ Mattermost credentials
   ```bash
   cp defaults.env .env
   vi .env
-  docker run --env-file=.env ghcr.io/maxwellpower/mm-emoji
+  docker run -it --name mm-emoji --env-file=.env ghcr.io/maxwellpower/mm-emoji
   ```
 
 ### Create Slack App
@@ -33,8 +33,9 @@ Mattermost credentials
     token_rotation_enabled: false
   ```
 
+- Navigate to "OAuth and Permissions"
 - Install App to Workspace
-- Copy Auth Token
+- Copy "OAuth Tokens for Your Workspace", "User OAuth Token"
 
 ## Based on
 

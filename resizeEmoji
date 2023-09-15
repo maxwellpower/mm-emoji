@@ -14,14 +14,19 @@
 # AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# resize all image formats that are larger than 1024X1024
-function _resizeEmoji() {
-  for file in *.{gif,jpg,jpeg,png}; do
-    if [ -f "$file" ]; then
-      echo "Resizing $file ..."
-      convert "$file" -resize 1024x1024\> "$file"
-    fi
-  done
-}
+# Find and resize image files in the current directory that are larger than 1024x1024
 
-_resizeEmoji
+# Start the resize command in the background
+find . -type f \( -iname \*.gif -o -iname \*.jpg -o -iname \*.jpeg -o -iname \*.png \) -exec mogrify -resize 1024x1024 {} + &
+RESIZE_PID=$!
+
+# Display a simple animated progress bar while the resize is running
+while kill -0 $RESIZE_PID 2>/dev/null; do
+  echo -n '.'
+  sleep 1
+done
+
+# Wait for the resize command to finish
+wait $RESIZE_PID
+
+echo "Resizing completed."

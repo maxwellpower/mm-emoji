@@ -14,16 +14,28 @@
 # AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-if [ -z ${SLACK_TOKEN+x} ]; then echo "SLACK_TOKEN Missing" && exit 1; fi
-if [ -z ${MM_URL+x} ]; then echo "MM_URL Missing" && exit 1; fi
-if [ -z ${MM_LOGIN_ID+x} ]; then echo "MM_LOGIN_ID Missing" && exit 1; fi
-if [ -z ${MM_PASSWORD+x} ]; then echo "MM_PASSWORD Missing" && exit 1; fi
-
-##################################
+# Check for necessary environment variables
+for var in SLACK_TOKEN MM_URL MM_LOGIN_ID MM_PASSWORD; do
+  if [ -z "${!var}" ]; then
+    echo "Error: $var is not set"
+    exit 1
+  fi
+done
 
 function _usage() {
-  printf "Usage: run \n"
-  exit 0
+  printf "Usage: $0 [run|get|clean|download|resize|upload|help]\n"
+  printf "\n"
+  printf "run:      Get Emojies from Slack and Upload to Mattermost\n"
+  printf "get:      Get Emojies from Slack\n"
+  printf "clean:    Remove Mattermost System Emoji's\n"
+  printf "download: Download Emojies from Slack\n"
+  printf "resize:   Resize Emojies\n"
+  printf "upload:   Upload Emojies to Mattermost\n"
+  printf "help:     Show this help message\n"
+  printf "\n"
+  printf "Example:\n"
+  printf "  $0 run\n"
+  printf "\n"
 }
 
 function _getEmojiesList() {
@@ -35,7 +47,10 @@ function _getEmojiesList() {
 function _downloadEmojies() {
   echo "Downloading Emojis from Slack ..."
   downloadEmoji
-  echo "Clean System Emoji's before Upload"
+}
+
+function _cleanEmojies() {
+  echo "Removing Mattermost System Emoji's ..."
   cleanSystemEmoji
 }
 
@@ -44,23 +59,83 @@ function _resizeEmojies() {
   resizeEmoji
 }
 
-function _createEmojies() {
+function _uploadEmojies() {
   echo "Uploading Emojis to Mattermost ..."
-  echo "This might take a while, and there is no progress bar"
+  echo "This might take a while depending on how many emojis you have"
   echo "You can watch the emoji selection dialogue in Mattermost to see if they are uploading"
   echo "Please wait ..."
-  mmemoji create -o json -n *.{gif,jpg,png}
-  echo "Done Uploading Emojis to Mattermost"
+
+  # Start the mmemoji create command in the background
+  mmemoji create -o json -n *.{gif,jpg,png} &
+  MMEMOJI_PID=$!
+
+  # Display a simple animated progress bar while the mmemoji create command is running
+  while kill -0 $MMEMOJI_PID 2>/dev/null; do
+    echo -n '.'
+    sleep 1
+  done
+
+  # Wait for the mmemoji create command to finish
+  wait $MMEMOJI_PID
+
+  echo "DONE Uploading Emojis to Mattermost"
   echo "Check your Mattermost install to ensure they have copied successfully"
   echo "An API error above may not indicate upload failure and may be ignored"
 }
 
 if [ "$1" == 'run' ]; then
   echo "Getting Emojies from Slack and Uploading to Mattermost"
+
   _getEmojiesList
+  if [ $? -ne 0 ]; then
+    echo "Error getting emoji list from Slack"
+    exit 1
+  fi
+
   _downloadEmojies
+  if [ $? -ne 0 ]; then
+    echo "Error downloading emojis from Slack"
+    exit 1
+  fi
+
+  _cleanEmojies
+  if [ $? -ne 0 ]; then
+    echo "Error cleaning emojis"
+    exit 1
+  fi
+
   _resizeEmojies
-  _createEmojies
+  if [ $? -ne 0 ]; then
+    echo "Error resizing emojis"
+    exit 1
+  fi
+
+  _uploadEmojies
+  if [ $? -ne 0 ]; then
+    echo "Error uploading emojis to Mattermost"
+    exit 1
+  fi
+  exit 0
+elif [ "$1" == 'get' ]; then
+  _getEmojiesList
+  cat emoji.list
+  exit 0
+elif [ "$1" == 'download' ]; then
+  _downloadEmojies
+  ls
+  exit 0
+elif [ "$1" == 'clean' ]; then
+  _cleanEmojies
+  exit 0
+elif [ "$1" == 'resize' ]; then
+  _resizeEmojies
+  exit 0
+elif [ "$1" == 'upload' ]; then
+  _uploadEmojies
+elif [ "$1" == 'help' ] OR ["$1" == 'usage']; then
+  _usage
+  exit 0
 else
   _usage
+  exit 1
 fi

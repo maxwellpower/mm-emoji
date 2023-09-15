@@ -12,21 +12,54 @@
 # AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-FROM python
+# Use a Python base image
+FROM python:3.9-slim AS base
 
-LABEL org.opencontainers.image.source = "https://github.com/maxwellpower/mmemoji"
+# Set environment variables to avoid warnings
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
-&& apt-get install -yqq --no-install-recommends ruby-full imagemagick \
-&& apt-get autoremove --purge -yqq \
-&& apt-get clean \
-&& rm -rf /var/lib/apt/lists/* \
-&& pip install mmemoji \
-&& mkdir mmemoji
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ruby \
+    imagemagick \
+    curl \
+    && apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/* \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
 
-COPY docker-entrypoint downloadEmoji resizeEmoji cleanSystemEmoji /usr/local/bin/
+# Install the mmemoji package
+RUN pip install --no-cache-dir mmemoji
 
-WORKDIR ["mmemoji"]
+# Use a separate build stage for copying the scripts
+FROM base AS builder
 
-ENTRYPOINT [ "docker-entrypoint" ]
-CMD [ "run" ]
+# Set the working directory
+WORKDIR /usr/local/bin/
+
+# Copy the scripts into the working directory
+COPY docker-entrypoint /usr/local/bin/
+COPY cleanSystemEmoji /usr/local/bin/
+COPY downloadEmoji /usr/local/bin/
+COPY resizeEmoji /usr/local/bin/
+
+# Use a final stage to create a clean image
+FROM base AS final
+
+LABEL org.opencontainers.image.source = "https://github.com/maxwellpower/mm-emoji"
+
+# Set the working directory
+WORKDIR /usr/local/bin/
+
+# Copy the scripts from the builder stage
+COPY --from=builder /usr/local/bin/ .
+
+WORKDIR /tmp/
+
+# Set the entry point and default command
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["run"]
