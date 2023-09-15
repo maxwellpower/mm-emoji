@@ -14,13 +14,17 @@
 # AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# Check for necessary environment variables
-for var in SLACK_TOKEN MM_URL MM_LOGIN_ID MM_PASSWORD; do
-  if [ -z "${!var}" ]; then
-    echo "Error: $var is not set"
+function _checkCredentials() {
+  if [ -z "$MM_MFA_TOKEN" ] && [ -z "$MM_TOKEN" ] && [ -z "$MM_PASSWORD" ]; then
+    echo "Error: Neither MM_MFA_TOKEN, MM_TOKEN, nor MM_PASSWORD is set. Please set at least one of them."
     exit 1
   fi
-done
+
+  if [ -z "$MM_MFA_TOKEN" ] && [ -z "$MM_TOKEN" ] && [ -z "$MM_PASSWORD" ]; then
+    echo "Error: Neither MM_MFA_TOKEN, MM_TOKEN, nor MM_PASSWORD is set. Please set at least one of them."
+    exit 1
+  fi
+}
 
 function _usage() {
   printf "Usage: $0 [run|get|clean|download|resize|upload|help]\n"
@@ -83,6 +87,10 @@ function _uploadEmojies() {
 }
 
 if [ "$1" == 'run' ]; then
+
+  # Check to ensure credentials are set
+  _checkCredentials
+
   echo "Getting Emojies from Slack and Uploading to Mattermost"
 
   _getEmojiesList
@@ -116,6 +124,7 @@ if [ "$1" == 'run' ]; then
   fi
   exit 0
 elif [ "$1" == 'get' ]; then
+  _checkCredentials
   _getEmojiesList
   cat emoji.list
   exit 0
@@ -130,6 +139,7 @@ elif [ "$1" == 'resize' ]; then
   _resizeEmojies
   exit 0
 elif [ "$1" == 'upload' ]; then
+  _checkCredentials
   _uploadEmojies
 elif [ "$1" == 'help' ] OR ["$1" == 'usage']; then
   _usage
