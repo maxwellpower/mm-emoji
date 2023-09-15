@@ -41,7 +41,6 @@ function _usage() {
 function _getEmojiesList() {
   echo "Getting Emoji List ..."
   curl -O -s --header "Authorization: Bearer $SLACK_TOKEN" "https://slack.com/api/emoji.list"
-  ls
 }
 
 function _downloadEmojies() {
