@@ -12,7 +12,7 @@ Mattermost credentials
   ```bash
   cp defaults.env .env
   vi .env
-  docker run -it --name mm-emoji --env-file=.env ghcr.io/maxwellpower/mm-emoji
+  docker run -it --rm --name mm-emoji --env-file=.env ghcr.io/maxwellpower/mm-emoji
   ```
 
 ### Create Slack App
