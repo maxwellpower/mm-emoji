@@ -75,16 +75,11 @@ function _resizeEmojies() {
 
 function _uploadEmojies() {
   echo "Uploading Emojis to Mattermost ..."
-  echo "This might take a while depending on how many emojis you have"
-  echo "You can watch the emoji selection dialogue in Mattermost to see if they are uploading"
-  echo "Please wait ..."
 
   # Start the mmemoji create command in the background
-  mmemoji create -o json -n *.{gif,jpg,png}
+  createEmoji
 
   echo "DONE Uploading Emojis to Mattermost"
-  echo "Check your Mattermost install to ensure they have copied successfully"
-  echo "An API error above may not indicate upload failure and may be ignored"
 }
 
 if [ "$1" == 'run' ]; then

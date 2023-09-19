@@ -46,6 +46,7 @@ COPY docker-entrypoint /usr/local/bin/
 COPY cleanSystemEmoji /usr/local/bin/
 COPY downloadEmoji /usr/local/bin/
 COPY resizeEmoji /usr/local/bin/
+COPY createEmoji /usr/local/bin/
 
 # Use a final stage to create a clean image
 FROM base AS final
