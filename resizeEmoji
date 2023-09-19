@@ -24,4 +24,14 @@ function _resizeEmoji() {
   done
 }
 
+function _optimizeJPEG() {
+  for file in *.{jpg,jpeg}; do
+    if [ -f "$file" ]; then
+      echo "Optimizing $file ..."
+      jpegoptim -s -S512 "$file"
+    fi
+  done
+}
+
 _resizeEmoji
+_optimizeJPEG

@@ -25,6 +25,7 @@ RUN apt-get update && \
     ruby \
     imagemagick \
     curl \
+    jpegoptim \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /tmp/* \
