@@ -27,11 +27,18 @@ function _resizeEmoji() {
 function _optimizeJPEG() {
   for file in *.{jpg,jpeg}; do
     if [ -f "$file" ]; then
-      echo "Optimizing $file ..."
+      echo "Optimizing JPEG $file ..."
       jpegoptim -s -S512 "$file"
     fi
   done
 }
 
+function _optimizePNG() {
+  for file in *.{png}; do
+    find . -name "*.png" -size +512k -exec sh -c 'echo "Optimizing PNG $1"; mogrify -define png:compression-level=9 -resize 75% -quality 85 "$1"' _ {} \;
+  done
+}
+
 _resizeEmoji
 _optimizeJPEG
+_optimizePNG
