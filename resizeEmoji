@@ -28,17 +28,42 @@ function _optimizeJPEG() {
   for file in *.{jpg,jpeg}; do
     if [ -f "$file" ]; then
       echo "Optimizing JPEG $file ..."
-      jpegoptim -s -S512 "$file"
+      jpegoptim --max=85 "$file"
+      while [ $(stat -c%s "$file") -gt 524288 ]; do
+        echo "Further optimizing JPEG $file ..."
+        jpegoptim --max=$(( $(jpegoptim --max=85 "$file" | grep -oP '(?<=\()[0-9]+(?=%)') - 10 )) "$file"
+      done
     fi
   done
 }
 
 function _optimizePNG() {
-  for file in *.{png}; do
-    find . -name "*.png" -size +512k -exec sh -c 'echo "Optimizing PNG $1"; mogrify -define png:compression-level=9 -resize 75% -quality 85 "$1"' _ {} \;
+  for file in *.png; do
+    if [ -f "$file" ]; then
+      echo "Optimizing PNG $file ..."
+      pngquant --force --ext .png "$file"
+      while [ $(stat -c%s "$file") -gt 524288 ]; do
+        echo "Further optimizing PNG $file ..."
+        mogrify -path . -filter Triangle -define filter:support=2 -thumbnail 75% -unsharp 0.25x0.25+8+0.065 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB "$file"
+      done
+    fi
+  done
+}
+
+function _optimizeGIF() {
+  for file in *.gif; do
+    if [ -f "$file" ]; then
+      echo "Optimizing GIF $file ..."
+      gifsicle --batch --optimize=3 "$file"
+      while [ $(stat -c%s "$file") -gt 524288 ]; do
+        echo "Further optimizing GIF $file ..."
+        gifsicle --batch --optimize=3 --scale 0.75 "$file"
+      done
+    fi
   done
 }
 
 _resizeEmoji
 _optimizeJPEG
 _optimizePNG
+_optimizeGIF

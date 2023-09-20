@@ -26,6 +26,8 @@ RUN apt-get update && \
     imagemagick \
     curl \
     jpegoptim \
+    pngquant \
+    gifsicle  \
     && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /tmp/* \
