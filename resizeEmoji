@@ -57,7 +57,7 @@ function _optimizeGIF() {
       gifsicle --batch --optimize=3 "$file"
       while [ $(stat -c%s "$file") -gt 524288 ]; do
         echo "Further optimizing GIF $file ..."
-        gifsicle --batch --optimize=3 --scale 0.75 "$file"
+        gifsicle --batch --optimize=3 --colors 256 --scale 0.75 "$file"
       done
     fi
   done
