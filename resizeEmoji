@@ -63,7 +63,24 @@ function _optimizeGIF() {
   done
 }
 
+# Function to move oversized images to a failed folder and log the action
+function _moveOversizedImages() {
+  for file in *.{gif,jpg,jpeg,png}; do
+    if [ -f "$file" ]; then
+      width=$(identify -format "%w" "$file")
+      height=$(identify -format "%h" "$file")
+      if [ "$width" -gt 1028 ] || [ "$height" -gt 1028 ]; then
+        echo "Moving oversized image $file to failed folder"
+        mkdir -p failed
+        echo "$file" >> resize_failed.log
+        mv "$file" failed/
+      fi
+    fi
+  done
+}
+
 _resizeEmoji
 _optimizeJPEG
 _optimizePNG
 _optimizeGIF
+_moveOversizedImages
