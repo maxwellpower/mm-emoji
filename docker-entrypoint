@@ -19,11 +19,6 @@ function _checkCredentials() {
     echo "Error: Neither MM_MFA_TOKEN, MM_TOKEN, nor MM_PASSWORD is set. Please set at least one of them."
     exit 1
   fi
-
-  if [ -z "$MM_MFA_TOKEN" ] && [ -z "$MM_TOKEN" ] && [ -z "$MM_PASSWORD" ]; then
-    echo "Error: Neither MM_MFA_TOKEN, MM_TOKEN, nor MM_PASSWORD is set. Please set at least one of them."
-    exit 1
-  fi
 }
 
 function _usage() {
