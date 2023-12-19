@@ -69,7 +69,7 @@ function _moveOversizedImages() {
     if [ -f "$file" ]; then
       width=$(identify -format "%w" "$file")
       height=$(identify -format "%h" "$file")
-      if [ "$width" -gt 1028 ] || [ "$height" -gt 1028 ]; then
+      if [ "$width" -gt 1027 ] || [ "$height" -gt 1027 ]; then
         echo "Moving oversized image $file to failed folder"
         mkdir -p failed
         echo "$file" >> resize_failed.log
