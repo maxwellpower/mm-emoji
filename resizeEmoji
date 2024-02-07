@@ -18,8 +18,15 @@
 function _resizeEmoji() {
   for file in *.{gif,jpg,jpeg,png}; do
     if [ -f "$file" ]; then
-      echo "Resizing $file ..."
-      convert "$file" -resize 1024x1024 "$file"
+      width=$(identify -format "%w" "${file}[0]")
+      height=$(identify -format "%h" "${file}[0]")
+
+      if [ "$width" -gt 1024 ] || [ "$height" -gt 1024 ]; then
+        echo "Resizing $file ..."
+        convert "$file" -resize 1024x1024 "$file"
+      else
+        echo "$file is not larger than 1024x1024, skipping..."
+      fi
     fi
   done
 }
@@ -67,8 +74,8 @@ function _optimizeGIF() {
 function _moveOversizedImages() {
   for file in *.{gif,jpg,jpeg,png}; do
     if [ -f "$file" ]; then
-      width=$(identify -format "%w" "$file")
-      height=$(identify -format "%h" "$file")
+      width=$(identify -format "%w" "${file}[0]")
+      height=$(identify -format "%h" "${file}[0]")
       if [ "$width" -gt 1024 ] || [ "$height" -gt 1024 ]; then
         echo "Moving oversized image $file to failed folder"
         mkdir -p failed
